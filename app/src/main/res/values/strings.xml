@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Aplicacion_DAMFlix_Jeremi_González_Perera</string>
+    <string name="nombre_usuario"> Jeremi González Perera </string>
+    <string name="rol"> Cliente </string>
+    <string name="peliculas_vistas"> 23 Peliculas Vistas </string>
+    <string name="resenas"> 3 Reseñas </string>
 </resources>
