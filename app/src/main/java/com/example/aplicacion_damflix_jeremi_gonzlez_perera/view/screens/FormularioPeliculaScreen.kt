@@ -12,13 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -57,7 +56,7 @@ fun FormularioPeliculaScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
                         )
                     }
@@ -70,14 +69,15 @@ fun FormularioPeliculaScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             OutlinedTextField(
                 value = titulo,
                 onValueChange = { titulo = it },
                 label = { Text("Título de la Película") },
                 modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
             )
 
             OutlinedTextField(
@@ -85,6 +85,7 @@ fun FormularioPeliculaScreen(
                 onValueChange = { director = it },
                 label = { Text("Director de la Película") },
                 modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
             )
 
             OutlinedTextField(
@@ -92,6 +93,7 @@ fun FormularioPeliculaScreen(
                 onValueChange = { fechaEstreno = it },
                 label = { Text("Fecha de Estreno") },
                 modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
             )
 
             OutlinedTextField(
@@ -99,17 +101,21 @@ fun FormularioPeliculaScreen(
                 onValueChange = { genero = it },
                 label = { Text("Género de la Película") },
                 modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
             )
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 4.dp),
             ) {
                 Checkbox(
                     checked = pendiente,
                     onCheckedChange = { pendiente = it },
                 )
-                Text(text = "Pendiente")
+                Text(text = "Pendiente de ver")
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Button(
                 onClick = {
@@ -126,7 +132,9 @@ fun FormularioPeliculaScreen(
                     Toast.makeText(context, "Película guardada: $titulo", Toast.LENGTH_SHORT).show()
                     onNavigateBack()
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
                 enabled = titulo.isNotBlank() && director.isNotBlank(),
             ) {
                 Text(text = "Guardar Película")

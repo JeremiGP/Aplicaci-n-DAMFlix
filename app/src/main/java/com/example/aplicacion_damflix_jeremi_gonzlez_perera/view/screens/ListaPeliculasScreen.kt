@@ -12,11 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.Pelicula
@@ -47,7 +48,7 @@ fun ListaPeliculasScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
                         )
                     }
@@ -65,7 +66,7 @@ fun ListaPeliculasScreen(
                 Text(
                     text = "No hay películas registradas.",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         } else {
@@ -73,10 +74,9 @@ fun ListaPeliculasScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                // Requisito 4: Optimizaciones - Asignar claves únicas mediante key en items()
                 items(
                     items = peliculas,
                     key = { pelicula -> pelicula.id },
@@ -96,9 +96,9 @@ fun PeliculaItemCard(
     pelicula: Pelicula,
     onToggleFavorite: () -> Unit,
 ) {
-    Card(
+    ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Row(
             modifier = Modifier
@@ -113,33 +113,36 @@ fun PeliculaItemCard(
                 Text(
                     text = pelicula.titulo,
                     style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Director: ${pelicula.director}",
                     style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "Género: ${pelicula.genero} | Estreno: ${pelicula.fechaEstreno}",
+                    text = "${pelicula.genero} • ${pelicula.fechaEstreno}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 if (pelicula.pendiente) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = "Pendiente de ver",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium,
                     )
                 }
             }
 
-            // Requisito 3: Acción Interactiva - IconButton con icono de corazón para favorito
             IconButton(onClick = onToggleFavorite) {
                 Icon(
                     imageVector = if (pelicula.esFavorita) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = if (pelicula.esFavorita) "Marcar como no favorita" else "Marcar como favorita",
-                    tint = if (pelicula.esFavorita) Color.Red else Color.Gray,
+                    tint = if (pelicula.esFavorita) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
