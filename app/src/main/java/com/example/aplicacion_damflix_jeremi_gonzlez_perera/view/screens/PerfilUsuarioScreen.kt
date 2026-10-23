@@ -1,4 +1,4 @@
-package com.example.aplicacion_damflix_jeremi_gonzlez_perera.ui.screens
+package com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border

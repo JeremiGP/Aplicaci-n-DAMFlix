@@ -1,4 +1,4 @@
-package com.example.aplicacion_damflix_jeremi_gonzlez_perera.ui.screens
+package com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement

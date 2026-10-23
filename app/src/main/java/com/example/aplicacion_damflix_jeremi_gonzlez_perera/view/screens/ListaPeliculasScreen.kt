@@ -1,4 +1,4 @@
-package com.example.aplicacion_damflix_jeremi_gonzlez_perera.ui.screens
+package com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -76,6 +76,7 @@ fun ListaPeliculasScreen(
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                // Requisito 4: Optimizaciones - Asignar claves únicas mediante key en items()
                 items(
                     items = peliculas,
                     key = { pelicula -> pelicula.id },
@@ -133,6 +134,7 @@ fun PeliculaItemCard(
                 }
             }
 
+            // Requisito 3: Acción Interactiva - IconButton con icono de corazón para favorito
             IconButton(onClick = onToggleFavorite) {
                 Icon(
                     imageVector = if (pelicula.esFavorita) Icons.Default.Favorite else Icons.Default.FavoriteBorder,

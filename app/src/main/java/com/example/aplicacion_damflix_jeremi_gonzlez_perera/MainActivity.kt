@@ -19,19 +19,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.Pelicula
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.ui.screens.FormularioPeliculaScreen
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.ui.screens.ListaPeliculasScreen
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.ui.screens.PerfilUsuarioScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.ui.theme.Aplicacion_DAMFlix_Jeremi_González_PereraTheme
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.FormularioPeliculaScreen
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.ListaPeliculasScreen
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.PerfilUsuarioScreen
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.MainViewModel
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.Screen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,61 +43,36 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-sealed class Screen {
-    object Inicio : Screen()
-    object Perfil : Screen()
-    object AñadirPelicula : Screen()
-    object ListaPeliculas : Screen()
-}
-
 @Composable
-fun MainContainerScreen() {
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.Inicio) }
-
-    var listaPeliculas by remember {
-        mutableStateOf(
-            listOf(
-                Pelicula(1, "Inception", "Christopher Nolan", "2010", "Ciencia Ficción", false, true),
-                Pelicula(2, "Interstellar", "Christopher Nolan", "2014", "Ciencia Ficción", true, false),
-                Pelicula(3, "The Dark Knight", "Christopher Nolan", "2008", "Acción", false, false),
-            ),
-        )
-    }
-
-    when (currentScreen) {
+fun MainContainerScreen(viewModel: MainViewModel = viewModel()) {
+    when (viewModel.currentScreen) {
         is Screen.Inicio -> {
             HomeScreen(
-                onNavigateToProfile = { currentScreen = Screen.Perfil },
-                onNavigateToForm = { currentScreen = Screen.AñadirPelicula },
-                onNavigateToMovieList = { currentScreen = Screen.ListaPeliculas },
+                onNavigateToProfile = { viewModel.navigateTo(Screen.Perfil) },
+                onNavigateToForm = { viewModel.navigateTo(Screen.AñadirPelicula) },
+                onNavigateToMovieList = { viewModel.navigateTo(Screen.ListaPeliculas) },
             )
         }
         is Screen.Perfil -> {
             PerfilUsuarioScreen(
-                onNavigateBack = { currentScreen = Screen.Inicio },
+                onNavigateBack = { viewModel.navigateTo(Screen.Inicio) },
             )
         }
         is Screen.AñadirPelicula -> {
             FormularioPeliculaScreen(
                 onPeliculaAdded = { nuevaPelicula ->
-                    listaPeliculas = listaPeliculas + nuevaPelicula
+                    viewModel.addPelicula(nuevaPelicula)
                 },
-                onNavigateBack = { currentScreen = Screen.Inicio },
+                onNavigateBack = { viewModel.navigateTo(Screen.Inicio) },
             )
         }
         is Screen.ListaPeliculas -> {
             ListaPeliculasScreen(
-                peliculas = listaPeliculas,
+                peliculas = viewModel.listaPeliculas,
                 onToggleFavorite = { id ->
-                    listaPeliculas = listaPeliculas.map { pelicula ->
-                        if (pelicula.id == id) {
-                            pelicula.copy(esFavorita = !pelicula.esFavorita)
-                        } else {
-                            pelicula
-                        }
-                    }
+                    viewModel.toggleFavorite(id)
                 },
-                onNavigateBack = { currentScreen = Screen.Inicio },
+                onNavigateBack = { viewModel.navigateTo(Screen.Inicio) },
             )
         }
     }
