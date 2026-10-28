@@ -6,17 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.Pelicula
 
-sealed class Screen {
-    object Inicio : Screen()
-    object Perfil : Screen()
-    object AñadirPelicula : Screen()
-    object ListaPeliculas : Screen()
-}
-
 class MainViewModel : ViewModel() {
-    var currentScreen by mutableStateOf<Screen>(Screen.Inicio)
-        private set
-
     var listaPeliculas by mutableStateOf(
         listOf(
             Pelicula(1, "Inception", "Christopher Nolan", "2010", "Ciencia Ficción", false, true),
@@ -25,10 +15,6 @@ class MainViewModel : ViewModel() {
         ),
     )
         private set
-
-    fun navigateTo(screen: Screen) {
-        currentScreen = screen
-    }
 
     fun addPelicula(pelicula: Pelicula) {
         listaPeliculas = listaPeliculas + pelicula
