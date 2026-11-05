@@ -4,4 +4,20 @@
     <string name="rol"> Cliente </string>
     <string name="peliculas_vistas"> 23 Peliculas Vistas </string>
     <string name="resenas"> 3 Reseñas </string>
+    <string name="btn_accept">Guardar</string>
+    <string name="titulo_pelicula">Título de la película</string>
+    <string name="director_pelicula">Director / Directora</string>
+    <string name="anio_estreno">Año de estreno</string>
+    <string name="fecha_estreno">Fecha de Estreno</string>
+    <string name="genero_pelicula">Género de la Película</string>
+    <string name="pendiente">Pendiente</string>
+    <string name="ya_vista">Ya he visto esta película</string>
+    <string name="anadir_pelicula">Añadir Nueva Película</string>
+    <string name="listado_peliculas">Listado de Películas</string>
+    <string name="perfil_usuario">Perfil de Usuario</string>
+    <string name="menu_principal">Menú Principal</string>
+    <string name="btn_ver_listado">Ver Listado de Películas</string>
+    <string name="btn_anadir">Añadir Película</string>
+    <string name="btn_perfil">Ver Perfil de Usuario</string>
+    <string name="no_peliculas">No hay películas registradas.</string>
 </resources>

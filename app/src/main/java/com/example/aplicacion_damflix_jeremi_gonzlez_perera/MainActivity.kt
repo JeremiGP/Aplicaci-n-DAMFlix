@@ -31,6 +31,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,7 +45,7 @@ import com.example.aplicacion_damflix_jeremi_gonzlez_perera.ui.theme.Aplicacion_
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.FormularioPeliculaScreen
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.ListaPeliculasScreen
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.PerfilUsuarioScreen
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.MainViewModel
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.PeliculaViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,7 +84,9 @@ sealed class Ruta(val path: String, val label: String, val icon: ImageVector) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainContainerScreen(viewModel: MainViewModel = viewModel()) {
+fun MainContainerScreen() {
+    val context = LocalContext.current
+    val viewModel: PeliculaViewModel = viewModel(factory = PeliculaViewModel.provideFactory(context))
     val navController = rememberNavController()
 
     Scaffold(
@@ -138,14 +142,13 @@ fun MainContainerScreen(viewModel: MainViewModel = viewModel()) {
             }
             composable(Ruta.Listado.path) {
                 ListaPeliculasScreen(
-                    peliculas = viewModel.listaPeliculas,
-                    onToggleFavorite = { id -> viewModel.toggleFavorite(id) },
+                    viewModel = viewModel,
                     onNavigateBack = { navController.popBackStack() },
                 )
             }
             composable(Ruta.Formulario.path) {
                 FormularioPeliculaScreen(
-                    onPeliculaAdded = { nuevaPelicula -> viewModel.addPelicula(nuevaPelicula) },
+                    viewModel = viewModel,
                     onNavigateBack = { navController.popBackStack() },
                 )
             }
@@ -194,7 +197,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .height(50.dp),
         ) {
-            Text(text = "Ver Listado de Películas", style = MaterialTheme.typography.bodyLarge)
+            Text(text = stringResource(R.string.btn_ver_listado), style = MaterialTheme.typography.bodyLarge)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -205,7 +208,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .height(50.dp),
         ) {
-            Text(text = "Añadir Película", style = MaterialTheme.typography.bodyLarge)
+            Text(text = stringResource(R.string.btn_anadir), style = MaterialTheme.typography.bodyLarge)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -216,7 +219,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .height(50.dp),
         ) {
-            Text(text = "Ver Perfil de Usuario", style = MaterialTheme.typography.bodyLarge)
+            Text(text = stringResource(R.string.btn_perfil), style = MaterialTheme.typography.bodyLarge,)
         }
     }
 }
