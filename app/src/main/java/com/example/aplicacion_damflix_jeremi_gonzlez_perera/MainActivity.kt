@@ -4,7 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,26 +14,34 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,120 +52,157 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.ui.theme.Aplicacion_DAMFlix_Jeremi_González_PereraTheme
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.FormularioPeliculaScreen
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.FormularioAgregarPeliculaScreen
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.ListaPeliculasScreen
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.PerfilUsuarioScreen
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.PeliculaViewModel
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.PeliculaViewModelFactory
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val app = application as DAMFlixApplication
+        val factory = PeliculaViewModelFactory(app.repository)
         setContent {
             Aplicacion_DAMFlix_Jeremi_González_PereraTheme {
-                MainContainerScreen()
+                val viewModel: PeliculaViewModel = viewModel(factory = factory)
+                AppDAMFlixMainScreen(viewModel = viewModel)
             }
         }
     }
 }
 
-sealed class Ruta(val path: String, val label: String, val icon: ImageVector) {
-    object Inicio : Ruta(
-        path = "inicio",
-        label = "Inicio",
-        icon = Icons.Filled.Home,
-    )
-    object Listado : Ruta(
-        path = "listado",
-        label = "Listado",
-        icon = Icons.Default.List,
-    )
-    object Formulario : Ruta(
-        path = "alta",
-        label = "Añadir",
-        icon = Icons.Filled.Add,
-    )
-    object Perfil : Ruta(
-        path = "perfil",
-        label = "Perfil",
-        icon = Icons.Filled.Person,
-    )
+sealed class Ruta(val path: String, @StringRes val tituloRes: Int, val icono: ImageVector) {
+    object Inicio : Ruta("inicio", R.string.menu_inicio, Icons.Default.Home)
+    object Catalogo : Ruta("catalogo", R.string.menu_catalogo, Icons.Default.List)
+    object Formulario : Ruta("alta", R.string.menu_alta, Icons.Default.Add)
+    object Perfil : Ruta("perfil", R.string.menu_perfil, Icons.Default.Person)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainContainerScreen() {
-    val context = LocalContext.current
-    val viewModel: PeliculaViewModel = viewModel(factory = PeliculaViewModel.provideFactory(context))
+fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
     val navController = rememberNavController()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val coroutineScope = rememberCoroutineScope()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val rutaActual = navBackStackEntry?.destination?.route
+    val opcionesMenu = listOf(Ruta.Inicio, Ruta.Catalogo, Ruta.Formulario, Ruta.Perfil)
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("DAMFlix", fontWeight = FontWeight.Bold) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                ),
-            )
-        },
-        bottomBar = {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val rutaActual = navBackStackEntry?.destination?.route
-            NavigationBar {
-                listOf(
-                    Ruta.Inicio,
-                    Ruta.Listado,
-                    Ruta.Formulario,
-                    Ruta.Perfil,
-                ).forEach { ruta ->
-                    NavigationBarItem(
-                        selected = rutaActual == ruta.path,
+    fun volverAlInicio() {
+        val popped = navController.popBackStack(Ruta.Inicio.path, inclusive = false)
+        if (!popped) {
+            navController.navigate(Ruta.Inicio.path) {
+                popUpTo(Ruta.Inicio.path) { inclusive = true }
+            }
+        }
+    }
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.drawer_titulo),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(12.dp))
+                opcionesMenu.forEach { opcion ->
+                    NavigationDrawerItem(
+                        icon = { Icon(opcion.icono, contentDescription = stringResource(opcion.tituloRes)) },
+                        label = { Text(stringResource(opcion.tituloRes)) },
+                        selected = rutaActual == opcion.path,
                         onClick = {
-                            if (rutaActual != ruta.path) {
-                                navController.navigate(ruta.path) {
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
+                            coroutineScope.launch { drawerState.close() }
+                            if (rutaActual != opcion.path) {
+                                if (opcion.path == Ruta.Inicio.path) {
+                                    volverAlInicio()
+                                } else {
+                                    navController.navigate(opcion.path) {
+                                        popUpTo(Ruta.Inicio.path) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
                                 }
                             }
                         },
-                        icon = { Icon(ruta.icon, contentDescription = ruta.label) },
-                        label = { Text(ruta.label) },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
                 }
             }
-        },
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Ruta.Inicio.path,
-            modifier = Modifier.padding(innerPadding),
-        ) {
-            composable(Ruta.Inicio.path) {
-                HomeScreen(
-                    onNavigateToMovieList = { navController.navigate(Ruta.Listado.path) },
-                    onNavigateToForm = { navController.navigate(Ruta.Formulario.path) },
-                    onNavigateToProfile = { navController.navigate(Ruta.Perfil.path) },
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.top_bar_titulo), fontWeight = FontWeight.Bold) },
+                    navigationIcon = {
+                        IconButton(onClick = { coroutineScope.launch { drawerState.open() } }) {
+                            Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.abrir_menu))
+                        }
+                    },
+                    actions = {
+                        if (rutaActual != Ruta.Inicio.path) {
+                            IconButton(onClick = { volverAlInicio() }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(R.string.btn_volver)
+                                )
+                            }
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
                 )
             }
-            composable(Ruta.Listado.path) {
-                ListaPeliculasScreen(
-                    viewModel = viewModel,
-                    onNavigateBack = { navController.popBackStack() },
-                )
-            }
-            composable(Ruta.Formulario.path) {
-                FormularioPeliculaScreen(
-                    viewModel = viewModel,
-                    onNavigateBack = { navController.popBackStack() },
-                )
-            }
-            composable(Ruta.Perfil.path) {
-                PerfilUsuarioScreen(
-                    onNavigateBack = { navController.popBackStack() },
-                )
+        ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = Ruta.Inicio.path,
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                composable(Ruta.Inicio.path) {
+                    HomeScreen(
+                        onNavigateToMovieList = { navController.navigate(Ruta.Catalogo.path) },
+                        onNavigateToForm = { navController.navigate(Ruta.Formulario.path) },
+                        onNavigateToProfile = { navController.navigate(Ruta.Perfil.path) }
+                    )
+                }
+                composable(Ruta.Catalogo.path) {
+                    ListaPeliculasScreen(
+                        viewModel = viewModel,
+                        onNavigateBack = { volverAlInicio() }
+                    )
+                }
+                composable(Ruta.Formulario.path) {
+                    FormularioAgregarPeliculaScreen(
+                        viewModel = viewModel,
+                        onPeliculaGuardada = {
+                            navController.navigate(Ruta.Catalogo.path) {
+                                popUpTo(Ruta.Inicio.path) { saveState = true }
+                            }
+                        },
+                        onNavigateBack = { volverAlInicio() }
+                    )
+                }
+                composable(Ruta.Perfil.path) {
+                    PerfilUsuarioScreen(
+                        onNavigateBack = { volverAlInicio() }
+                    )
+                }
             }
         }
     }
@@ -163,30 +210,30 @@ fun MainContainerScreen() {
 
 @Composable
 fun HomeScreen(
-    onNavigateToProfile: () -> Unit,
-    onNavigateToForm: () -> Unit,
     onNavigateToMovieList: () -> Unit,
+    onNavigateToForm: () -> Unit,
+    onNavigateToProfile: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Bienvenido a DAMFlix",
+            text = stringResource(R.string.home_bienvenida),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Tu gestor personal de películas",
+            text = stringResource(R.string.home_subtitulo),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(48.dp))
@@ -195,7 +242,7 @@ fun HomeScreen(
             onClick = onNavigateToMovieList,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
+                .height(50.dp)
         ) {
             Text(text = stringResource(R.string.btn_ver_listado), style = MaterialTheme.typography.bodyLarge)
         }
@@ -206,7 +253,7 @@ fun HomeScreen(
             onClick = onNavigateToForm,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
+                .height(50.dp)
         ) {
             Text(text = stringResource(R.string.btn_anadir), style = MaterialTheme.typography.bodyLarge)
         }
@@ -217,9 +264,9 @@ fun HomeScreen(
             onClick = onNavigateToProfile,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
+                .height(50.dp)
         ) {
-            Text(text = stringResource(R.string.btn_perfil), style = MaterialTheme.typography.bodyLarge,)
+            Text(text = stringResource(R.string.btn_perfil), style = MaterialTheme.typography.bodyLarge)
         }
     }
 }
@@ -229,9 +276,9 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     Aplicacion_DAMFlix_Jeremi_González_PereraTheme {
         HomeScreen(
-            onNavigateToProfile = {},
-            onNavigateToForm = {},
             onNavigateToMovieList = {},
+            onNavigateToForm = {},
+            onNavigateToProfile = {}
         )
     }
 }

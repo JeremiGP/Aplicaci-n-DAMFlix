@@ -1,10 +1,20 @@
 <resources>
     <string name="app_name">Aplicacion_DAMFlix_Jeremi_González_Perera</string>
+    <string name="top_bar_titulo">DAMFlix</string>
+    <string name="abrir_menu">Abrir Menú</string>
+    <string name="drawer_titulo">DAMFlix</string>
+    <string name="menu_inicio">Inicio</string>
+    <string name="menu_catalogo">Catálogo</string>
+    <string name="menu_alta">Añadir Película</string>
+    <string name="menu_perfil">Perfil de Usuario</string>
     <string name="nombre_usuario"> Jeremi González Perera </string>
     <string name="rol"> Cliente </string>
     <string name="peliculas_vistas"> 23 Peliculas Vistas </string>
     <string name="resenas"> 3 Reseñas </string>
     <string name="btn_accept">Guardar</string>
+    <string name="btn_volver">Volver</string>
+    <string name="btn_volver_inicio">Volver al Inicio</string>
+    <string name="anadir_pelicula">Añadir Película</string>
     <string name="titulo_pelicula">Título de la película</string>
     <string name="director_pelicula">Director / Directora</string>
     <string name="anio_estreno">Año de estreno</string>
@@ -12,12 +22,12 @@
     <string name="genero_pelicula">Género de la Película</string>
     <string name="pendiente">Pendiente</string>
     <string name="ya_vista">Ya he visto esta película</string>
-    <string name="anadir_pelicula">Añadir Nueva Película</string>
-    <string name="listado_peliculas">Listado de Películas</string>
-    <string name="perfil_usuario">Perfil de Usuario</string>
-    <string name="menu_principal">Menú Principal</string>
     <string name="btn_ver_listado">Ver Listado de Películas</string>
     <string name="btn_anadir">Añadir Película</string>
     <string name="btn_perfil">Ver Perfil de Usuario</string>
     <string name="no_peliculas">No hay películas registradas.</string>
+    <string name="marcar_favorito">Marcar como favorito</string>
+    <string name="home_bienvenida">Bienvenido a DAMFlix</string>
+    <string name="home_subtitulo">Tu gestor personal de películas</string>
+    <string name="avatar_usuario">Avatar de usuario</string>
 </resources>
