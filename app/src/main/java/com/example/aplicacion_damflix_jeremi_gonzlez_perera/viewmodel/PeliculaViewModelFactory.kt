@@ -2,7 +2,7 @@ package com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.data.PeliculaRepository
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.data.PeliculaRepository
 
 class PeliculaViewModelFactory(
     private val repository: PeliculaRepository
