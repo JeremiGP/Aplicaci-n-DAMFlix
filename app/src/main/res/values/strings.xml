@@ -30,4 +30,12 @@
     <string name="home_bienvenida">Bienvenido a DAMFlix</string>
     <string name="home_subtitulo">Tu gestor personal de películas</string>
     <string name="avatar_usuario">Avatar de usuario</string>
+    <string name="menu_detalle">Detalle</string>
+    <string name="btn_volver_catalogo">← Volver al Catálogo</string>
+    <string name="cargando_datos">Cargando datos de Room en segundo plano...</string>
+    <string name="director_label">Director/a: %1$s</string>
+    <string name="anio_label">Año de estreno: %1$d</string>
+    <string name="estado_label_vista">Estado: Ya vista</string>
+    <string name="estado_label_pendiente">Estado: Pendiente</string>
+    <string name="error_pelicula_no_encontrada">Película no encontrada.</string>
 </resources>

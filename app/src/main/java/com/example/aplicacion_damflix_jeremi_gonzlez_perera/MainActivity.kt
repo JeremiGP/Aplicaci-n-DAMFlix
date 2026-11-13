@@ -39,7 +39,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.navigation.Ruta
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
+import androidx.compose.ui.platform.LocalContext
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.data.navigation.Ruta
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.PantallaDetalleScreen
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.DetallePeliculaViewModel
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.DetallePeliculaViewModelFactory
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.ui.theme.Aplicacion_DAMFlix_Jeremi_González_PereraTheme
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.FormularioAgregarPeliculaScreen
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.InicioScreen
@@ -167,7 +173,10 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
                 composable(Ruta.Catalogo.path) {
                     ListaPeliculasScreen(
                         viewModel = viewModel,
-                        onNavigateBack = { volverAlInicio() }
+                        onNavigateBack = { volverAlInicio() },
+                        onPeliculaClick = { peliculaId ->
+                            navController.navigate(Ruta.Detalle.crearRuta(peliculaId))
+                        }
                     )
                 }
                 composable(Ruta.Formulario.path) {
@@ -184,6 +193,26 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
                 composable(Ruta.Perfil.path) {
                     PerfilUsuarioScreen(
                         onNavigateBack = { volverAlInicio() }
+                    )
+                }
+                composable(
+                    route = Ruta.Detalle.path,
+                    arguments = listOf(
+                        navArgument("peliculaId") {
+                            type = NavType.IntType
+                        }
+                    )
+                ) { backStackEntry ->
+                    val id = backStackEntry.arguments?.getInt("peliculaId") ?: 0
+                    val context = LocalContext.current
+                    val app = context.applicationContext as DAMFlixApplication
+                    val detalleViewModel: DetallePeliculaViewModel = viewModel(
+                        factory = DetallePeliculaViewModelFactory(app.repository)
+                    )
+                    PantallaDetalleScreen(
+                        peliculaId = id,
+                        viewModel = detalleViewModel,
+                        onVolver = { navController.popBackStack() }
                     )
                 }
             }

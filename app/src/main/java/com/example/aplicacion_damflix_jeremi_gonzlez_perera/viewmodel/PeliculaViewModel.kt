@@ -2,7 +2,7 @@ package com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.data.PeliculaRepository
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.data.repository.PeliculaRepository
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.data.local.PeliculaEntity
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

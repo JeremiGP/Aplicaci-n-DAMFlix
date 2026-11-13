@@ -38,7 +38,8 @@ import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.PeliculaVi
 fun ListaPeliculasScreen(
     viewModel: PeliculaViewModel,
     modifier: Modifier = Modifier,
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    onPeliculaClick: (Int) -> Unit = {}
 ) {
     val peliculas by viewModel.listaPeliculas.collectAsStateWithLifecycle()
 
@@ -74,7 +75,8 @@ fun ListaPeliculasScreen(
             ) { pelicula ->
                 TarjetaPeliculaItem(
                     pelicula = pelicula,
-                    onToggleFavorito = { viewModel.conmutarFavorito(pelicula) }
+                    onToggleFavorito = { viewModel.conmutarFavorito(pelicula) },
+                    onPeliculaClick = { onPeliculaClick(pelicula.id) }
                 )
             }
             item {
@@ -93,9 +95,15 @@ fun ListaPeliculasScreen(
 @Composable
 fun TarjetaPeliculaItem(
     pelicula: PeliculaEntity,
-    onToggleFavorito: () -> Unit
+    onToggleFavorito: () -> Unit,
+    onPeliculaClick: () -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        onClick = onPeliculaClick
+    ) {
         Row(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically

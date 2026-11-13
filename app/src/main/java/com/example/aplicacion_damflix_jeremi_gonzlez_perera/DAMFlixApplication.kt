@@ -1,7 +1,7 @@
 package com.example.aplicacion_damflix_jeremi_gonzlez_perera
 
 import android.app.Application
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.data.PeliculaRepository
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.data.repository.PeliculaRepository
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.data.local.AppDatabase
 
 class DAMFlixApplication : Application() {
