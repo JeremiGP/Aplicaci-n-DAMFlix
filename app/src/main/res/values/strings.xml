@@ -4,8 +4,9 @@
     <string name="abrir_menu">Abrir Menú</string>
     <string name="drawer_titulo">DAMFlix</string>
     <string name="menu_inicio">Inicio</string>
-    <string name="menu_catalogo">Catálogo</string>
+    <string name="menu_catalogo">Mi Catálogo Nube</string>
     <string name="menu_alta">Añadir Película</string>
+    <string name="menu_explorar">Explorar Online</string>
     <string name="menu_perfil">Perfil de Usuario</string>
     <string name="nombre_usuario"> Jeremi González Perera </string>
     <string name="rol"> Cliente </string>
@@ -32,10 +33,33 @@
     <string name="avatar_usuario">Avatar de usuario</string>
     <string name="menu_detalle">Detalle</string>
     <string name="btn_volver_catalogo">← Volver al Catálogo</string>
-    <string name="cargando_datos">Cargando datos de Room en segundo plano...</string>
+    <string name="cargando_datos">Cargando datos en segundo plano...</string>
     <string name="director_label">Director/a: %1$s</string>
     <string name="anio_label">Año de estreno: %1$d</string>
     <string name="estado_label_vista">Estado: Ya vista</string>
     <string name="estado_label_pendiente">Estado: Pendiente</string>
     <string name="error_pelicula_no_encontrada">Película no encontrada.</string>
+
+    <!-- Strings para Actividad 9 (Firestore + API REST) -->
+    <string name="titulo_nueva_pelicula">Nueva Película en Nube</string>
+    <string name="titulo_editar_pelicula">Editar Película</string>
+    <string name="label_titulo">Título de la película</string>
+    <string name="label_director">Director / Cadena</string>
+    <string name="label_anio">Año de estreno</string>
+    <string name="label_ya_vista">Ya he visto esta película</string>
+    <string name="label_buscar_api">Buscar producción online...</string>
+    <string name="btn_guardar">Guardar en Firestore</string>
+    <string name="btn_actualizar">Actualizar Película</string>
+    <string name="btn_importar_nube">Guardar en mi nube</string>
+    <string name="btn_reintentar">Reintentar</string>
+    <string name="msg_catalogo_vacio">No hay películas en tu nube todavía.</string>
+    <string name="detalle_director">Director/a o Cadena: %1$s</string>
+    <string name="detalle_anio">Año de estreno: %1$d</string>
+    <string name="estado_vista">Estado: Ya vista</string>
+    <string name="estado_pendiente">Estado: Pendiente de ver</string>
+    <string name="desc_favorito">Marcar como favorita</string>
+    <string name="desc_editar">Editar película</string>
+    <string name="desc_eliminar">Eliminar película</string>
+    <string name="error_sin_conexion">No hay conexión a Internet. Revisa tu red.</string>
+    <string name="error_servidor_http">Error al consultar el catálogo remoto.</string>
 </resources>

@@ -31,7 +31,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,33 +43,37 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.data.navigation.Ruta
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.ui.theme.Aplicacion_DAMFlix_Jeremi_González_PereraTheme
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.FormularioAgregarPeliculaScreen
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.DetallePeliculaCloudScreen
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.FormularioPeliculaCloudScreen
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.InicioScreen
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.ListaPeliculasScreen
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.PantallaDetalleScreen
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.ListaPeliculasCloudScreen
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.PantallaExplorarScreen
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.PerfilUsuarioScreen
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.DetallePeliculaViewModel
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.DetallePeliculaViewModelFactory
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.PeliculaViewModel
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.PeliculaViewModelFactory
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.ExplorarViewModel
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.ExplorarViewModelFactory
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.FirestorePeliculaViewModel
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.FirestorePeliculaViewModelFactory
 import kotlinx.coroutines.launch
 
 /**
- * Actividad principal de la aplicación DAMFlix.
- *
- * Configura la vista sin bordes (Edge-to-Edge), inicializa el [PeliculaViewModel]
- * mediante su fábrica e inyecta la interfaz gráfica Jetpack Compose.
+ * Actividad principal de la aplicación DAMFlix (Cloud Firestore + Retrofit).
  */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val app = application as DAMFlixApplication
-        val factory = PeliculaViewModelFactory(app.repository)
+        val firestoreFactory = FirestorePeliculaViewModelFactory(app.firestoreRepository)
+        val explorarFactory = ExplorarViewModelFactory(app.firestoreRepository)
+
         setContent {
             Aplicacion_DAMFlix_Jeremi_González_PereraTheme {
-                val viewModel: PeliculaViewModel = viewModel(factory = factory)
-                AppDAMFlixMainScreen(viewModel = viewModel)
+                val firestoreViewModel: FirestorePeliculaViewModel = viewModel(factory = firestoreFactory)
+                val explorarViewModel: ExplorarViewModel = viewModel(factory = explorarFactory)
+                AppDAMFlixMainScreen(
+                    firestoreViewModel = firestoreViewModel,
+                    explorarViewModel = explorarViewModel
+                )
             }
         }
     }
@@ -78,30 +81,21 @@ class MainActivity : ComponentActivity() {
 
 /**
  * Composable contenedor principal de la interfaz de la app.
- *
- * Incluye la estructura [ModalNavigationDrawer] para el menú lateral desplegable,
- * la barra superior [TopAppBar] con controles de navegación, y el [NavHost]
- * que coordina las pantallas de la aplicación.
- *
- * @param viewModel Instancia principal de [PeliculaViewModel].
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
-    // Controlador de navegación Jetpack Navigation
+fun AppDAMFlixMainScreen(
+    firestoreViewModel: FirestorePeliculaViewModel,
+    explorarViewModel: ExplorarViewModel
+) {
     val navController = rememberNavController()
-    // Estado del menú desplegable lateral (ModalNavigationDrawer)
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
 
-    // Observa el estado actual de la pila de navegación para saber qué ruta está activa
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val rutaActual = navBackStackEntry?.destination?.route
     val opcionesMenu = Ruta.opcionesMenu
 
-    /**
-     * Función auxiliar para regresar a la pantalla de inicio desapilando las pantallas intermedias.
-     */
     fun volverAlInicio() {
         val popped = navController.popBackStack(Ruta.Inicio.path, inclusive = false)
         if (!popped) {
@@ -111,12 +105,10 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
         }
     }
 
-    // Estructura de navegación con menú lateral desplegable
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                // Cabecera del Drawer
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -130,11 +122,10 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
                 }
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(12.dp))
-                // Elementos interactivos del menú lateral
                 opcionesMenu.forEach { opcion ->
                     NavigationDrawerItem(
-                        icon = { Icon(opcion.icono, contentDescription = stringResource(opcion.tituloRes)) },
-                        label = { Text(stringResource(opcion.tituloRes)) },
+                        icon = { Icon(opcion.icono, contentDescription = stringResource(opcion.labelResId)) },
+                        label = { Text(stringResource(opcion.labelResId)) },
                         selected = rutaActual == opcion.path,
                         onClick = {
                             coroutineScope.launch { drawerState.close() }
@@ -158,7 +149,6 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
             }
         }
     ) {
-        // Estructura visual Scaffold con TopAppBar y cuerpo central
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -169,7 +159,6 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
                         }
                     },
                     actions = {
-                        // Muestra el botón de volver si no estamos en la pantalla de inicio
                         if (rutaActual != Ruta.Inicio.path) {
                             IconButton(onClick = { volverAlInicio() }) {
                                 Icon(
@@ -185,13 +174,12 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
                 )
             }
         ) { innerPadding ->
-            // Grafo principal de navegación
             NavHost(
                 navController = navController,
-                startDestination = Ruta.Inicio.path,
+                startDestination = Ruta.Catalogo.path,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                // Destino 1: Inicio
+                // Inicio
                 composable(Ruta.Inicio.path) {
                     InicioScreen(
                         onNavigateToMovieList = { navController.navigate(Ruta.Catalogo.path) },
@@ -199,53 +187,69 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
                         onNavigateToProfile = { navController.navigate(Ruta.Perfil.path) }
                     )
                 }
-                // Destino 2: Catálogo de películas
+
+                // Catálogo Nube
                 composable(Ruta.Catalogo.path) {
-                    ListaPeliculasScreen(
-                        viewModel = viewModel,
-                        onNavigateBack = { volverAlInicio() },
-                        onPeliculaClick = { peliculaId ->
-                            navController.navigate(Ruta.Detalle.crearRuta(peliculaId))
+                    ListaPeliculasCloudScreen(
+                        viewModel = firestoreViewModel,
+                        onPeliculaClick = { id -> navController.navigate(Ruta.Detalle.crearRuta(id)) },
+                        onEditarClick = { id -> navController.navigate(Ruta.Editar.crearRuta(id)) }
+                    )
+                }
+
+                // Alta (Modo Creación)
+                composable(Ruta.Formulario.path) {
+                    FormularioPeliculaCloudScreen(
+                        viewModel = firestoreViewModel,
+                        onOperacionCompletada = {
+                            navController.navigate(Ruta.Catalogo.path) {
+                                popUpTo(Ruta.Formulario.path) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
                         }
                     )
                 }
-                // Destino 3: Formulario para añadir película
-                composable(Ruta.Formulario.path) {
-                    FormularioAgregarPeliculaScreen(
-                        viewModel = viewModel,
-                        onPeliculaGuardada = {
-                            navController.navigate(Ruta.Catalogo.path) {
-                                popUpTo(Ruta.Inicio.path) { saveState = true }
-                            }
-                        },
-                        onNavigateBack = { volverAlInicio() }
+
+                // Edición (Modo Update completo pasando peliculaId)
+                composable(
+                    route = Ruta.Editar.path,
+                    arguments = listOf(navArgument("peliculaId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("peliculaId") ?: ""
+                    FormularioPeliculaCloudScreen(
+                        peliculaId = id,
+                        viewModel = firestoreViewModel,
+                        onOperacionCompletada = { navController.popBackStack() }
                     )
                 }
-                // Destino 4: Perfil de usuario
+
+                // Detalle (Consulta por ID en Firestore)
+                composable(
+                    route = Ruta.Detalle.path,
+                    arguments = listOf(navArgument("peliculaId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("peliculaId") ?: ""
+                    DetallePeliculaCloudScreen(
+                        peliculaId = id,
+                        viewModel = firestoreViewModel,
+                        onVolver = { navController.popBackStack() }
+                    )
+                }
+
+                // Explorar API REST (Retrofit + TVMaze)
+                composable(Ruta.Explorar.path) {
+                    PantallaExplorarScreen(
+                        viewModel = explorarViewModel,
+                        onPeliculaImportada = { navController.navigate(Ruta.Catalogo.path) }
+                    )
+                }
+
+                // Perfil
                 composable(Ruta.Perfil.path) {
                     PerfilUsuarioScreen(
                         onNavigateBack = { volverAlInicio() }
-                    )
-                }
-                // Destino 5: Detalle de película con parámetro dinámico peliculaId
-                composable(
-                    route = Ruta.Detalle.path,
-                    arguments = listOf(
-                        navArgument("peliculaId") {
-                            type = NavType.IntType
-                        }
-                    )
-                ) { backStackEntry ->
-                    val id = backStackEntry.arguments?.getInt("peliculaId") ?: 0
-                    val context = LocalContext.current
-                    val app = context.applicationContext as DAMFlixApplication
-                    val detalleViewModel: DetallePeliculaViewModel = viewModel(
-                        factory = DetallePeliculaViewModelFactory(app.repository)
-                    )
-                    PantallaDetalleScreen(
-                        peliculaId = id,
-                        viewModel = detalleViewModel,
-                        onVolver = { navController.popBackStack() }
                     )
                 }
             }
