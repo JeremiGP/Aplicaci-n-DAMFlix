@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.data.repository.PeliculaRepository
 
+/**
+ * Fábrica (Factory) para la instanciación e inyección de dependencias en [PeliculaViewModel].
+ */
 class PeliculaViewModelFactory(
     private val repository: PeliculaRepository
 ) : ViewModelProvider.Factory {

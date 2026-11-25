@@ -34,6 +34,18 @@ import com.example.aplicacion_damflix_jeremi_gonzlez_perera.R
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.data.local.PeliculaEntity
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.PeliculaViewModel
 
+/**
+ * Pantalla que muestra el catálogo de películas en una [LazyColumn].
+ *
+ * Se suscribe de forma reactiva a la lista expuesta por el [PeliculaViewModel].
+ * Aplica el patrón de elevación de eventos (Event Hoisting) notificando mediante callbacks
+ * la navegación al detalle y los cambios en el estado de favoritos.
+ *
+ * @param viewModel ViewModel de la lista de películas.
+ * @param modifier Modificador para Compose.
+ * @param onNavigateBack Callback para regresar al inicio.
+ * @param onPeliculaClick Callback elevado para navegar al detalle de la película seleccionada pasando su ID.
+ */
 @Composable
 fun ListaPeliculasScreen(
     viewModel: PeliculaViewModel,
@@ -41,9 +53,11 @@ fun ListaPeliculasScreen(
     onNavigateBack: () -> Unit = {},
     onPeliculaClick: (Int) -> Unit = {}
 ) {
+    // Recoge la lista de películas reactivamente respetando el ciclo de vida de la pantalla
     val peliculas by viewModel.listaPeliculas.collectAsStateWithLifecycle()
 
     if (peliculas.isEmpty()) {
+        // Vista vacía si no hay películas registradas en Room
         Box(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -64,6 +78,7 @@ fun ListaPeliculasScreen(
             }
         }
     } else {
+        // Renderizado optimizado del catálogo usando LazyColumn
         LazyColumn(
             modifier = modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
@@ -92,6 +107,13 @@ fun ListaPeliculasScreen(
     }
 }
 
+/**
+ * Composable que dibuja la tarjeta de cada película individual en el catálogo.
+ *
+ * @param pelicula Datos de la entidad [PeliculaEntity].
+ * @param onToggleFavorito Evento para marcar/desmarcar como favorita.
+ * @param onPeliculaClick Evento pulsación sobre la tarjeta para abrir la vista de detalle.
+ */
 @Composable
 fun TarjetaPeliculaItem(
     pelicula: PeliculaEntity,
@@ -145,6 +167,7 @@ fun TarjetaPeliculaItem(
                     )
                 }
             }
+            // Botón icono para marcar/desmarcar como favorita
             IconButton(onClick = onToggleFavorito) {
                 Icon(
                     imageVector = if (pelicula.esFavorita) Icons.Default.Favorite else Icons.Default.FavoriteBorder,

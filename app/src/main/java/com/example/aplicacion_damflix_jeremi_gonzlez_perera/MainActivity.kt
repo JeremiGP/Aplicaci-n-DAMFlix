@@ -31,30 +31,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.navigation.NavType
-import androidx.compose.ui.platform.LocalContext
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.model.data.navigation.Ruta
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.PantallaDetalleScreen
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.DetallePeliculaViewModel
-import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.DetallePeliculaViewModelFactory
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.ui.theme.Aplicacion_DAMFlix_Jeremi_González_PereraTheme
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.FormularioAgregarPeliculaScreen
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.InicioScreen
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.ListaPeliculasScreen
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.PantallaDetalleScreen
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.view.screens.PerfilUsuarioScreen
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.DetallePeliculaViewModel
+import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.DetallePeliculaViewModelFactory
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.PeliculaViewModel
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.PeliculaViewModelFactory
 import kotlinx.coroutines.launch
 
+/**
+ * Actividad principal de la aplicación DAMFlix.
+ *
+ * Configura la vista sin bordes (Edge-to-Edge), inicializa el [PeliculaViewModel]
+ * mediante su fábrica e inyecta la interfaz gráfica Jetpack Compose.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,16 +76,32 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/**
+ * Composable contenedor principal de la interfaz de la app.
+ *
+ * Incluye la estructura [ModalNavigationDrawer] para el menú lateral desplegable,
+ * la barra superior [TopAppBar] con controles de navegación, y el [NavHost]
+ * que coordina las pantallas de la aplicación.
+ *
+ * @param viewModel Instancia principal de [PeliculaViewModel].
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
+    // Controlador de navegación Jetpack Navigation
     val navController = rememberNavController()
+    // Estado del menú desplegable lateral (ModalNavigationDrawer)
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
+
+    // Observa el estado actual de la pila de navegación para saber qué ruta está activa
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val rutaActual = navBackStackEntry?.destination?.route
     val opcionesMenu = Ruta.opcionesMenu
 
+    /**
+     * Función auxiliar para regresar a la pantalla de inicio desapilando las pantallas intermedias.
+     */
     fun volverAlInicio() {
         val popped = navController.popBackStack(Ruta.Inicio.path, inclusive = false)
         if (!popped) {
@@ -89,10 +111,12 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
         }
     }
 
+    // Estructura de navegación con menú lateral desplegable
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
+                // Cabecera del Drawer
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -106,6 +130,7 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
                 }
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(12.dp))
+                // Elementos interactivos del menú lateral
                 opcionesMenu.forEach { opcion ->
                     NavigationDrawerItem(
                         icon = { Icon(opcion.icono, contentDescription = stringResource(opcion.tituloRes)) },
@@ -133,6 +158,7 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
             }
         }
     ) {
+        // Estructura visual Scaffold con TopAppBar y cuerpo central
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -143,6 +169,7 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
                         }
                     },
                     actions = {
+                        // Muestra el botón de volver si no estamos en la pantalla de inicio
                         if (rutaActual != Ruta.Inicio.path) {
                             IconButton(onClick = { volverAlInicio() }) {
                                 Icon(
@@ -158,11 +185,13 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
                 )
             }
         ) { innerPadding ->
+            // Grafo principal de navegación
             NavHost(
                 navController = navController,
                 startDestination = Ruta.Inicio.path,
                 modifier = Modifier.padding(innerPadding)
             ) {
+                // Destino 1: Inicio
                 composable(Ruta.Inicio.path) {
                     InicioScreen(
                         onNavigateToMovieList = { navController.navigate(Ruta.Catalogo.path) },
@@ -170,6 +199,7 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
                         onNavigateToProfile = { navController.navigate(Ruta.Perfil.path) }
                     )
                 }
+                // Destino 2: Catálogo de películas
                 composable(Ruta.Catalogo.path) {
                     ListaPeliculasScreen(
                         viewModel = viewModel,
@@ -179,6 +209,7 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
                         }
                     )
                 }
+                // Destino 3: Formulario para añadir película
                 composable(Ruta.Formulario.path) {
                     FormularioAgregarPeliculaScreen(
                         viewModel = viewModel,
@@ -190,11 +221,13 @@ fun AppDAMFlixMainScreen(viewModel: PeliculaViewModel) {
                         onNavigateBack = { volverAlInicio() }
                     )
                 }
+                // Destino 4: Perfil de usuario
                 composable(Ruta.Perfil.path) {
                     PerfilUsuarioScreen(
                         onNavigateBack = { volverAlInicio() }
                     )
                 }
+                // Destino 5: Detalle de película con parámetro dinámico peliculaId
                 composable(
                     route = Ruta.Detalle.path,
                     arguments = listOf(

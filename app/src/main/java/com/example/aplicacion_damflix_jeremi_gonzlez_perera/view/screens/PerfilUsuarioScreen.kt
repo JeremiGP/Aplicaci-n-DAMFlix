@@ -30,6 +30,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.R
 
+/**
+ * Pantalla de perfil del usuario registrado.
+ *
+ * Muestra el avatar del usuario, su nombre, rol e información estadística.
+ *
+ * @param modifier Modificador para Compose.
+ * @param onNavigateBack Callback para regresar a la pantalla de inicio.
+ */
 @Composable
 fun PerfilUsuarioScreen(
     modifier: Modifier = Modifier,
@@ -44,6 +52,7 @@ fun PerfilUsuarioScreen(
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Imagen de avatar recortada circularmente
         Image(
             painter = painterResource(id = R.drawable.avatar),
             contentDescription = stringResource(id = R.string.avatar_usuario),
@@ -60,6 +69,7 @@ fun PerfilUsuarioScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        // Nombre del usuario
         Text(
             text = stringResource(id = R.string.nombre_usuario),
             style = MaterialTheme.typography.titleLarge,
@@ -68,6 +78,7 @@ fun PerfilUsuarioScreen(
 
         Spacer(modifier = Modifier.height(4.dp))
 
+        // Rol o descripción del usuario
         Text(
             text = stringResource(id = R.string.rol),
             style = MaterialTheme.typography.bodyMedium,
@@ -76,6 +87,7 @@ fun PerfilUsuarioScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Tarjeta informativa con datos estadísticos del perfil
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -107,6 +119,7 @@ fun PerfilUsuarioScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Botón para volver a inicio
         Button(
             onClick = onNavigateBack,
             modifier = Modifier.fillMaxWidth()

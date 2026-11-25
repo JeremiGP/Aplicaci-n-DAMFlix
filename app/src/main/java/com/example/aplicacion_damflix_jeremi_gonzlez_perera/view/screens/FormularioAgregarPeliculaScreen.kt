@@ -30,6 +30,16 @@ import androidx.compose.ui.unit.dp
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.R
 import com.example.aplicacion_damflix_jeremi_gonzlez_perera.viewmodel.PeliculaViewModel
 
+/**
+ * Pantalla con formulario de alta para registrar una nueva película en Room.
+ *
+ * Incluye validación de campos obligatorios (título y director) para habilitar el botón de guardado.
+ *
+ * @param viewModel Instancia de [PeliculaViewModel] para guardar la película.
+ * @param modifier Modificador para Compose.
+ * @param onPeliculaGuardada Callback invocado tras guardar la película con éxito.
+ * @param onNavigateBack Callback para volver al inicio.
+ */
 @Composable
 fun FormularioAgregarPeliculaScreen(
     viewModel: PeliculaViewModel,
@@ -37,6 +47,7 @@ fun FormularioAgregarPeliculaScreen(
     onPeliculaGuardada: () -> Unit = {},
     onNavigateBack: () -> Unit = {}
 ) {
+    // Estados locales para controlar los campos de entrada del formulario
     var titulo by remember { mutableStateOf("") }
     var director by remember { mutableStateOf("") }
     var anioTexto by remember { mutableStateOf("") }
@@ -45,6 +56,7 @@ fun FormularioAgregarPeliculaScreen(
     var pendiente by remember { mutableStateOf(false) }
     var esVista by remember { mutableStateOf(false) }
 
+    // Validación básica: exige título y director no vacíos
     val esFormularioValido = titulo.isNotBlank() && director.isNotBlank()
 
     Column(
@@ -59,6 +71,7 @@ fun FormularioAgregarPeliculaScreen(
             style = MaterialTheme.typography.headlineMedium
         )
 
+        // Campo: Título de la película
         OutlinedTextField(
             value = titulo,
             onValueChange = { titulo = it },
@@ -67,6 +80,7 @@ fun FormularioAgregarPeliculaScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        // Campo: Director o Directora
         OutlinedTextField(
             value = director,
             onValueChange = { director = it },
@@ -75,6 +89,7 @@ fun FormularioAgregarPeliculaScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        // Campo: Año de estreno
         OutlinedTextField(
             value = anioTexto,
             onValueChange = { anioTexto = it },
@@ -84,6 +99,7 @@ fun FormularioAgregarPeliculaScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        // Campo: Fecha de estreno en formato texto
         OutlinedTextField(
             value = fechaEstreno,
             onValueChange = { fechaEstreno = it },
@@ -92,6 +108,7 @@ fun FormularioAgregarPeliculaScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        // Campo: Género cinematográfico
         OutlinedTextField(
             value = genero,
             onValueChange = { genero = it },
@@ -100,6 +117,7 @@ fun FormularioAgregarPeliculaScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        // Casilla de verificación: Película pendiente
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
@@ -108,6 +126,7 @@ fun FormularioAgregarPeliculaScreen(
             Text(text = stringResource(R.string.pendiente))
         }
 
+        // Casilla de verificación: Película vista
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
@@ -118,6 +137,7 @@ fun FormularioAgregarPeliculaScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Botón de guardar entrada
         Button(
             onClick = {
                 val anio = anioTexto.toIntOrNull() ?: 0
@@ -130,6 +150,7 @@ fun FormularioAgregarPeliculaScreen(
                     pendiente = pendiente,
                     esVista = esVista
                 )
+                // Limpia el formulario tras guardar
                 titulo = ""
                 director = ""
                 anioTexto = ""
@@ -145,6 +166,7 @@ fun FormularioAgregarPeliculaScreen(
             Text(text = stringResource(R.string.btn_accept))
         }
 
+        // Botón para cancelar y regresar
         OutlinedButton(
             onClick = onNavigateBack,
             modifier = Modifier.fillMaxWidth()
